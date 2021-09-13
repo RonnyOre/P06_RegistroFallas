@@ -13,12 +13,16 @@ class ERP_CALIDAD_P001(QMainWindow):
         QMainWindow.__init__(self)
         uic.loadUi("ERP_PCALIDAD_003.ui",self)
 
+        # global Cod_Soc,Nom_Soc,Cod_Usuario
+        # Cod_Soc='1000'
+        # Nom_Soc='MULTICABLE PERU S.A.C.'
+        # Cod_Usuario='2021100004'
+
         self.pbGrabar.clicked.connect(self.Grabar)
         self.pbOtra_Familia.clicked.connect(self.OtraFamilia)
         self.pbSalir.clicked.connect(self.Salir)
 
         self.cbFamilia.activated.connect(self.SubFamilia)
-        self.cbSubFamilia.activated.connect(self.CodFalla)
 
         Familia=consultarSql(sqlFamilia)
         insertarDatos(self.cbFamilia,Familia)
@@ -38,7 +42,6 @@ class ERP_CALIDAD_P001(QMainWindow):
         cargarIcono(self.pbGrabar, 'grabar')
 
     def SubFamilia(self):
-        global Cod_Familia
         if self.cbFamilia.currentText()!=0:
             texto=self.cbFamilia.currentText()
             Cod_Familia=texto[0:texto.find("-")-1]
@@ -48,14 +51,16 @@ class ERP_CALIDAD_P001(QMainWindow):
                 insertarDatos(self.cbSubFamilia,SubFamilia)
                 self.cbSubFamilia.setCurrentIndex(-1)
 
-    def CodFalla(self):
-        global Cod_SubFamilia
-        if self.cbSubFamilia.currentText()!=0:
-            texto=self.cbSubFamilia.currentText()
-            Cod_SubFamilia=texto[0:texto.find("-")-1]
-
     def Grabar(self):
         try:
+            if self.cbFamilia.currentText()!=0:
+                texto=self.cbFamilia.currentText()
+                Cod_Familia=texto[0:texto.find("-")-1]
+
+            if self.cbSubFamilia.currentText()!=0:
+                texto=self.cbSubFamilia.currentText()
+                Cod_SubFamilia=texto[0:texto.find("-")-1]
+
             Cod_Falla=self.leCod_Falla.text()
             Descrip_Falla=self.pteDescrip_Falla.toPlainText()
             # Descrip_Falla=self.pteDescrip_Falla.setPlainText()
@@ -78,13 +83,13 @@ class ERP_CALIDAD_P001(QMainWindow):
             else:
                 mensajeDialogo("error", "Error", "Faltan llenar datos")
         except:
-            mensajeDialogo("error", "Error", "Faltan llenar todos los datos")
+            mensajeDialogo("error", "Error", "No se pudo grabar, verifique los campos")
 
     def OtraFamilia(self):
         self.cbFamilia.setEnabled(True)
         self.cbSubFamilia.setEnabled(True)
         self.cbFamilia.setCurrentIndex(-1)
-        self.cbSubFamilia.setCurrentIndex(-1)
+        self.cbSubFamilia.clear()
         self.leCod_Falla.clear()
         self.pteDescrip_Falla.clear()
         self.pbGrabar.setEnabled(True)
